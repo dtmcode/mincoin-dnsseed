@@ -5,7 +5,6 @@
 */
 
 // MySQL/PowerDNS version
-/*
 // Functions used by bitcoin-scan.php and bitcoin-scan-net.php
 function connect_to_db() {
 	global $db, $CONFIG;
@@ -33,7 +32,8 @@ function add_node_to_dns($ip, $port, $version) {
 	global $db, $CONFIG;
 	if (empty($db))
 		connect_to_db();
-
+    
+    echo "Adding node {$ip}:{$port} with version {$version}\n";
 	if (!empty($ip) && ip2long($ip) != 0 && !empty($port) && is_numeric($port) && $port != 0 && is_numeric($version) && $version > 0) {
 		$db->query("INSERT INTO `".$CONFIG['MYSQL_BITCOIN_TABLE']."` "
 			."(`ipv4`, `port`, `accepts_incoming`, `last_check`, `version`, `first_up`) VALUES "
@@ -46,7 +46,7 @@ function add_node_to_dns($ip, $port, $version) {
 			."WHERE `ipv4` = '" . ip2long($ip) . "' AND `port` = '" . $port . "';");
 	}
 
-	if (!empty($ip) && ip2long($ip) != 0 && $version >= $CONFIG['MIN_VERSION'] && $port == 8333)
+	if (!empty($ip) && ip2long($ip) != 0 && $version >= $CONFIG['MIN_VERSION'] && $port == 9334)
 		$db->query("INSERT INTO `".$CONFIG['MYSQL_PDNS_DB']."`.`".$CONFIG['MYSQL_PDNS_RECORDS_TABLE']."` "
 			."(`domain_id`, `name`, `type`, `content`, `ttl`, `prio`, `change_date`) VALUES "
 			."('" . $CONFIG['PDNS_DOMAIN_ID'] . "', '" . $CONFIG['DOMAIN_NAME'] . "', 'A', '" . $ip . "', '" . $CONFIG['PDNS_RECORD_TTL'] . "', '0', '" . date("Ymd") . "00');");
@@ -57,6 +57,7 @@ function add_untested_node($ip, $port) {
 	if (empty($db))
 		connect_to_db();
 
+    echo "Adding untested node {$ip}:{$port}\n";
 	if (!empty($ip) && ip2long($ip) != 0 && !empty($port) && is_numeric($port) && $port != 0) {
 		$db->query("INSERT INTO `".$CONFIG['MYSQL_BITCOIN_TABLE']."` "
 			."(`ipv4`, `port`) VALUES "
@@ -73,6 +74,7 @@ function remove_node($ip, $port) {
 	if (empty($db))
 		connect_to_db();
 
+    echo "Removing node {$ip}:{$port}\n";
 	if (!empty($ip) && ip2long($ip) != 0 && !empty($port) && is_numeric($port) && $port != 0)
 		$db->query("UPDATE `".$CONFIG['MYSQL_BITCOIN_TABLE']."` SET "
 			."`last_check` = NOW(), "
@@ -92,7 +94,7 @@ function remove_node($ip, $port) {
 
 // Functions used only by bitcoin-scan-net.php
 function scan_node($ip, $port) {
-	exec("nohup ./bitcoin-scan.php ".long2ip($ip).":".$port." > /dev/null 2>/dev/null &");
+	passthru("./bitcoin-scan.php ".long2ip($ip).":".$port);
 }
 
 function query_unchecked() {
@@ -125,8 +127,9 @@ function get_assoc_result_row($result) {
 function prune_nodes() {
 	global $db, $CONFIG;
 	$db->query("DELETE FROM `".$CONFIG['MYSQL_BITCOIN_TABLE']."` WHERE `last_seen` < NOW() - INTERVAL " . $CONFIG['PURGE_AGE'] . " SECOND AND `accepts_incoming` = b'0';");
-}*/
+}
 
+/*
 // SQLite/BIND version
 // Functions used by bitcoin-scan.php and bitcoin-scan-net.php
 function connect_to_db() {
@@ -137,7 +140,7 @@ function connect_to_db() {
 	$db->busyTimeout(5000);
 	$db->exec("CREATE TABLE IF NOT EXISTS nodes (
 			ipv4 INT NOT NULL,
-			port INT NOT NULL DEFAULT 8333,
+			port INT NOT NULL DEFAULT 9334,
 			last_check INT DEFAULT NULL,
 			accepts_incoming INT NOT NULL DEFAULT 0,
 			version INT DEFAULT NULL,
@@ -276,22 +279,23 @@ function prune_nodes() {
 	$current_time = time() - $CONFIG['PURGE_AGE'];
 	$db->exec("DELETE FROM nodes WHERE last_seen < " . $current_time . " AND accepts_incoming = 0;");
 }
+*/
 
 // Functions used only by fill-dns.php
 function get_list_of_nodes_for_dns() {
 	global $db, $CONFIG;
-	return $db->query("SELECT ipv4 FROM nodes WHERE accepts_incoming = 1 AND port = 8333 AND version >= ".$CONFIG['MIN_VERSION']." ORDER BY last_check DESC LIMIT 20;");
+	return $db->query("SELECT ipv4 FROM nodes WHERE accepts_incoming = 1 AND port = 9334 AND version >= ".$CONFIG['MIN_VERSION']." ORDER BY last_check DESC LIMIT 20;");
 }
 
 // Functions used only by count-nodes.php
 function query_version_count() {
 	global $db, $CONFIG;
-	return $db->query("SELECT COUNT(*), version FROM nodes WHERE accepts_incoming = 1 AND port = 8333 GROUP BY version ORDER BY version;");
+	return $db->query("SELECT COUNT(*), version FROM nodes WHERE accepts_incoming = 1 AND port = 9334 GROUP BY version ORDER BY version;");
 }
 
 function query_dns_total() {
 	global $db, $CONFIG;
-	return $db->query("SELECT COUNT(*) FROM nodes WHERE accepts_incoming = 1 AND port = 8333 AND version >= ".$CONFIG['MIN_VERSION'].";");
+	return $db->query("SELECT COUNT(*) FROM nodes WHERE accepts_incoming = 1 AND port = 9334 AND version >= ".$CONFIG['MIN_VERSION'].";");
 }
 
 function query_total() {

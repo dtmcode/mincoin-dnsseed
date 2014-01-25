@@ -1,25 +1,24 @@
 #!/usr/bin/php
 
 <?php
-
 require("config.php");
 require("bitcoin-node.php");
 require("global.php");
 
 if ($argc != 2)
-	exit;
+	die("Missing arguments\n");
 
 $arr = explode(":", $argv[1]);
 if (count($arr) > 2 || count($arr) == 0)
 	exit;
 
-$port = count($arr)==1 ? 8333 : $arr[1];
+$port = count($arr)==1 ? 9334 : $arr[1];
 
 try {
 	$origNode = new Bitcoin\Node($arr[0], $port, $CONFIG['CONNECT_TIMEOUT']);
-	$origNode->getAddr();
+    $origNode->getAddr();
 	$nodes = $origNode->getAddr();
-
+    
         if (!empty($nodes)) {
 		start_db_transaction();
 
@@ -39,6 +38,7 @@ try {
 	start_db_transaction();
 	remove_node($arr[0], $port);
 	commit_db_transaction();
+    echo $e->getMessage() . "\n";
 }
 
 exit;
