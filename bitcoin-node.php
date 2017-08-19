@@ -8,7 +8,7 @@ class Node {
 	private $myself;
 	private $queue = array();
 
-	public function __construct($ip, $port = 9334, $timeout = 5) {
+	public function __construct($ip, $port = 10332, $timeout = 5) {
 		$this->sock = @fsockopen($ip, $port, $errno, $errstr, $timeout);
 		if (!$this->sock) throw new Exception("Connection Error: " . $errstr, $errno);
 
