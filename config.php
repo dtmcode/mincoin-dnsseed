@@ -3,7 +3,7 @@
 $CONFIG['MYSQL_HOST']			 = "localhost";
 $CONFIG['MYSQL_USER']			 = "dns";
 $CONFIG['MYSQL_PASS']			 = "***";
-$CONFIG['MYSQL_BITCOIN_DB']		 = "mincoindns";
+$CONFIG['MYSQL_BITCOIN_DB']		 = "weebcoindns";
 $CONFIG['MYSQL_BITCOIN_TABLE']		 = "nodes";
 $CONFIG['MYSQL_PDNS_DB']		 = "powerdns";
 $CONFIG['MYSQL_PDNS_RECORDS_TABLE']	 = "records";
@@ -14,7 +14,7 @@ $CONFIG['SQLITE_FILE']			 = "bitcoin.sqlite";
 $CONFIG['BIND_HEADER_FILE']		 = "./db.dnsseed.bitcoin.bit.header";
 $CONFIG['BIND_RECORD_FILE']		 = "./db.dnsseed.bitcoin.bit";
 
-$CONFIG['DOMAIN_NAME']			 = "seed.mincointools.net";
+$CONFIG['DOMAIN_NAME']			 = "dnsseed.weebcoin.com";
 $CONFIG['RECORD_TTL']			 = "60";
 
 // The minimum version to be added to the DNS database
