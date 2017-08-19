@@ -12,7 +12,7 @@ $arr = explode(":", $argv[1]);
 if (count($arr) > 2 || count($arr) == 0)
 	exit;
 
-$port = count($arr)==1 ? 9334 : $arr[1];
+$port = count($arr)==1 ? 10332 : $arr[1];
 
 try {
 	$origNode = new Bitcoin\Node($arr[0], $port, $CONFIG['CONNECT_TIMEOUT']);
